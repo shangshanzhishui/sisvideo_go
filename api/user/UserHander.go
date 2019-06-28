@@ -1,5 +1,6 @@
 package user
 import (
+	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
   	"log"
 	"sis_video_go/db"
@@ -11,7 +12,10 @@ func Login(username string,pwd string) error {
 
 		return err
 	}
-	stmt.Exec(username,pwd)
+	_,err = stmt.Exec(username,pwd)
+	if err != nil{
+		return nil
+	}
 	defer stmt.Close()
 	return nil
 }
@@ -23,7 +27,11 @@ func GetUser(username string) (string,error){
 		return "",err
 	}
 	var pwd string
-	stmt.QueryRow(username).Scan(&pwd)
+	err = stmt.QueryRow(username).Scan(&pwd)
+	if err != nil && err != sql.ErrNoRows{
+		return "",err
+
+	}
 	defer stmt.Close()
 	return pwd ,nil
 }
@@ -34,7 +42,10 @@ func DeleteUser(username string,pwd string ) error{
 		log.Println(err)
 		return nil
 	}
-	stmt.Exec(username,pwd)
+	_,err = stmt.Exec(username,pwd)
+	if err != nil{
+		return err
+	}
 	defer stmt.Close()
 	return nil
 
