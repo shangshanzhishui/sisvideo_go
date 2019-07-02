@@ -6,6 +6,12 @@ import (
 	"sis_video_go/db"
 )
 
+type User struct {
+	Username   string `json:"username"`
+	Pwd        string `json:"pwd"`
+	Login_time string `json:"login_time"`
+}
+
 func Login(username string,pwd string) error {
 	stmt,err := db.Db.Prepare("insert into user (username,pwd) values (?,?)")
 	if err != nil{
