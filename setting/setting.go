@@ -12,3 +12,4 @@ type ErrHttpResponse struct {
 
 var Mysql_db_name ="root"
 var Mysql_Password = "12345678"
+var SessionExpired = int64(30 * 60 *1000)
