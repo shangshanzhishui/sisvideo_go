@@ -12,7 +12,7 @@ type User struct {
 	Login_time string `json:"login_time"`
 }
 
-func Login(username string,pwd string) error {
+func AddUser(username string,pwd string) error {
 	stmt,err := db.Db.Prepare("insert into user (username,pwd) values (?,?)")
 	if err != nil{
 

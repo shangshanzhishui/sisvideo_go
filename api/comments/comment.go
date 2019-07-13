@@ -16,7 +16,7 @@ type Comment struct {
 }
 
 func AddComment(vid string,aid int,content string) (*Comment,error){
-	id := utils.CreateUUID()
+	id := utils.NewUUID()
 	t := time.Now()
 	ctime := t.Format("jan 02 2006,15:04:05")
 	stmt,err := db.Db.Prepare("insert into comments (id ,video_id,author_id,content,display_time) values (?,?,?,?,?)")

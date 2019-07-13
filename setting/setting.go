@@ -1,9 +1,11 @@
 package setting
 
 type Error struct {
-	Error string `json:"error"`
+	ErrorMsg string `json:"error_msg"`
 	ErrCode string `json:"err_code"`
 }
+
+
 
 type ErrHttpResponse struct {
 	HttpResCode int
