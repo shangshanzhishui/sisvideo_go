@@ -36,7 +36,7 @@ func JsonSucess(w http.ResponseWriter,v interface{},msg string) error{
 	jsonSucess.Data = v
 	jsonSucess.Msg = msg
 
-	data ,err := json.Marshal(v)
+	data ,err := json.Marshal(jsonSucess)
 	if err != nil{
 		return err
 	}
