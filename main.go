@@ -22,7 +22,7 @@ func (m middleWareHandler) ServrHttp(w http.ResponseWriter, r *http.Request){
 func RegisterHandle() *httprouter.Router{
 	router := httprouter.New()
 	router.POST("/user",CreateUser)
-	router.POST("/login",user.Login())
+	router.POST("/login",user.Login)
 	return router
 }
 
