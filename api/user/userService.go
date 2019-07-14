@@ -43,10 +43,10 @@ func GetUser(username string) (string,error){
 }
 
 func DeleteUser(username string,pwd string ) error{
-	stmt , err := db.Db.Prepare("delete from users where username=? and pwd =?")
+	stmt , err := db.Db.Prepare("delete from user where username=? and pwd =?")
 	if err != nil{
 		log.Println(err)
-		return nil
+		return err
 	}
 	_,err = stmt.Exec(username,pwd)
 	if err != nil{
@@ -55,4 +55,19 @@ func DeleteUser(username string,pwd string ) error{
 	defer stmt.Close()
 	return nil
 
+}
+
+func GetUserId(username string) (int,error){
+	id :=0
+	stmt ,err := db.Db.Prepare("select id from user where username = ?")
+	if err != nil{
+		log.Println(err)
+		return 0,err
+	}
+	err = stmt.QueryRow(username).Scan(&id)
+	if err != nil{
+		return 0,err
+	}
+	defer stmt.Close()
+	return id,nil
 }
