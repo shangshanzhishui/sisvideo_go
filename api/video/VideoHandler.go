@@ -15,7 +15,7 @@ type Video_info struct {
 }
 
 func AddVideo(aid int,name string)(*Video_info,error){
-	id := utils.CreateUUID()
+	id := utils.NewUUID()
 	t := time.Now()
 	ctime := t.Format("jan 02 2006,15:04:05")
 	stmt ,err := db.Db.Prepare(`insert into video_info 
