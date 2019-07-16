@@ -1,10 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
-	"sis_video_go/common"
-	"sis_video_go/stream_server"
+	"os"
 
 	"sis_video_go/api/user"
 )
@@ -12,25 +12,7 @@ type middleWareHandler struct {
 	r *httprouter.Router
 }
 
-type streamMiddleWareHandle struct {
-	 r *httprouter.Router
-	 l *stream_server.ConnLimiter
-}
 
-func NewStreamMiddleWareHandle(r *httprouter.Router ,cc int){
-	m := streamMiddleWareHandle{}
-	m.r = r
-	m.l = stream_server.NewConnLimiter(cc)
-}
-
-func (m streamMiddleWareHandle) ServeHTTP(w http.ResponseWriter, r *http.Request){
-	if !m.l.GetCon(){
-		common.JsonFail(w,http.StatusTooManyRequests,"too many request")
-		return
-	}
-	m.r.ServeHTTP(w,r)
-	defer m.l.ReleaseConn()
-}
 
 func MiddleWareHandler(r *httprouter.Router) http.Handler{
 	m := middleWareHandler{}
@@ -50,9 +32,14 @@ func RegisterHandle() *httprouter.Router{
 }
 
 func main(){
+	v,err := os.Open("./videos/123.rmvb")
+	if err != nil{
+		fmt.Print(err)
+	}
+	fmt.Println(v)
 	r := RegisterHandle()
 	m := MiddleWareHandler(r)
-	http.ListenAndServe(":8080",r)
-	http.ListenAndServe(":9090",m)
+	http.ListenAndServe(":8080",m)
+
 
 }

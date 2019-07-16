@@ -1,4 +1,5 @@
-package stream_server
+package main
+
 
 import "log"
 
