@@ -2,7 +2,10 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
+	"log"
 	"sis_video_go/setting"
+	_"github.com/go-sql-driver/mysql"
 )
 
 var (
@@ -12,10 +15,15 @@ var (
 
 func init() {
 
-	dataSourceName := setting.Mysql_db_name + setting.Mysql_Password +"@#@(127.0.0.1:3306)/sis_video?charset=utf8"
-	Db,err := sql.Open("mysql",dataSourceName)
+	dataSourceName := setting.Mysql_db_name +":"+ setting.Mysql_Password +"@(localhost:3306)/sis_video?charset=utf8"
+	fmt.Println(dataSourceName)
+	Db,err = sql.Open("mysql",dataSourceName)
 	if err != nil{
-		panic(err.Error())
+		panic(err)
 	}
+	if err := Db.Ping(); err != nil{
+		panic(err)
+	}
+	log.Printf("db is init %s",Db)
 
 }

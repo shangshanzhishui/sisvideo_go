@@ -2,6 +2,7 @@ package user
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"io/ioutil"
 	"net/http"
@@ -14,11 +15,19 @@ type user2 struct {
 }
 func Login(w http.ResponseWriter,r *http.Request,p httprouter.Params){
 	res,_ := ioutil.ReadAll(r.Body)
+	fmt.Println(string(res))
+
 	user := &user2{}
 	if err := json.Unmarshal(res,user); err != nil{
+
 		common.JsonFail(w,500,"注册失败")
+		fmt.Println(user)
 		return
 	}
+	fmt.Println(12)
+	fmt.Println(user)
+
+
 	if err := AddUser(user.Username,user.Pwd);err != nil{
 		common.JsonFail(w,500,"注册失败")
 		return
@@ -31,5 +40,6 @@ func Login(w http.ResponseWriter,r *http.Request,p httprouter.Params){
 	id := session.CreateSessionId(author_id)
 	data := []map[string]string{{"id":id}}
 	common.JsonSucess(w,data,200,"注册成功")
+
 	return
 }

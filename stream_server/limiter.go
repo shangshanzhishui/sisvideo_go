@@ -25,5 +25,5 @@ func (c *ConnLimiter) GetCon()bool{
 
 func (c *ConnLimiter) ReleaseConn(){
 	cc := <-c.bucket
-	log.Println("new connection")
+	log.Println("new connection %s",cc)
 }

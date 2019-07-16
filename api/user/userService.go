@@ -1,6 +1,7 @@
 package user
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
   	"log"
 	"sis_video_go/db"
@@ -12,13 +13,14 @@ type User struct {
 	Login_time string `json:"login_time"`
 }
 
-func AddUser(username string,pwd string) error {
+func AddUser(usernam string,pw string) error {
+	fmt.Print(usernam,pw)
 	stmt,err := db.Db.Prepare("insert into user (username,pwd) values (?,?)")
 	if err != nil{
-
+		fmt.Println(err)
 		return err
 	}
-	_,err = stmt.Exec(username,pwd)
+	_,err = stmt.Exec("nihao","123")
 	if err != nil{
 		return nil
 	}

@@ -3,7 +3,6 @@ package common
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -18,18 +17,18 @@ type JsonRes struct {
 var jsonSucess = JsonRes{
 	Msg: "",
 	Response:"ok",
-	Data:nil,
-	Error:nil,
-	Nums:nil,
+	Data:0,
+	Error:0,
+	Nums:0,
 
 }
 
 var jsonFail = JsonRes{
 	Msg: "",
 	Response:"fail",
-	Data:nil,
-	Error:nil,
-	Nums:nil,
+	Data:0,
+	Error:0,
+	Nums:0,
 
 }
 func JsonSucess(w http.ResponseWriter,v interface{},code int,msg string) error{
@@ -40,7 +39,7 @@ func JsonSucess(w http.ResponseWriter,v interface{},code int,msg string) error{
 	if err != nil{
 		return err
 	}
-	fmt.Fprint(w,data)
+	w.Write(data)
 	return nil
 }
 
@@ -52,7 +51,7 @@ func JsonFail(w http.ResponseWriter,code int,msg string) error{
 	if err != nil{
 		return err
 	}
-	fmt.Fprint(w,data)
+	w.Write(data)
 	return nil
 }
 
