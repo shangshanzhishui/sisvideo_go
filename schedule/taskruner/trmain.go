@@ -1,7 +1,7 @@
 package taskruner
 
 import (
-
+	"log"
 	"time"
 )
 
@@ -18,11 +18,15 @@ func NewWorker(interval time.Duration,r *Runner) *Work{
 
 }
 
+
+
 func(w * Work) StartWork(){
 	for {
 		select {
 			case <- w.ticker.C:
 				go w.runner.Start()
+				log.Println(123)
+
 		}
 	}
 }
@@ -32,4 +36,5 @@ func WorkStart(){
 	r := NewRunner(true,3,ClearVideoExecuter,ClearVideoDispatcher)
 	w := NewWorker(3,r)
 	go w.StartWork()
+
 }

@@ -9,6 +9,7 @@ import (
 )
 
 func ClearVideoDispatcher(d DataChan)error{
+	log.Println("ClearVideoDispatcher")
 	res,err := sch_db.ReadDelVideoRecord(3)
 	if err!= nil{
 		log.Println(err)
@@ -20,11 +21,13 @@ func ClearVideoDispatcher(d DataChan)error{
 	for _,id := range res{
 		d <- id
 	}
+	log.Println("ClearVideoDispatcher")
 	return nil
 }
 
 func DelVideo(vid string) error{
 	err:= os.Remove(VIDEO_DICTORY+vid)
+	log.Println(err)
 	if err !=nil && !os.IsNotExist(err){
 		log.Println(err)
 		return err
@@ -33,6 +36,7 @@ func DelVideo(vid string) error{
 }
 
 func ClearVideoExecuter(d DataChan) error{
+	log.Println("ClearVideoExecuter start")
 	errMap := &sync.Map{}
 	out:
 		for{
@@ -63,5 +67,6 @@ func ClearVideoExecuter(d DataChan) error{
 		}
 		return true
 	})
+	log.Println("ClearVideoExecuter")
 	return err
 }

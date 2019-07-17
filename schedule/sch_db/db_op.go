@@ -47,3 +47,17 @@ func DelVideoDelRecord(vid string)error{
 	stmt.Close()
 	return nil
 }
+
+func AddVideoDelRecord(vid string) error{
+	stmt ,err := db.Db.Prepare("insert into del_Video_Record (video_id) values (?)")
+	if err !=nil{
+		return err
+	}
+	_,err = stmt.Exec(vid)
+	if err !=nil{
+		log.Printf("添加shipin删除记录失败：%v",err)
+		return err
+	}
+	defer stmt.Close()
+	return nil
+}

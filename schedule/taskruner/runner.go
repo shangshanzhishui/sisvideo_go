@@ -1,5 +1,7 @@
 package taskruner
 
+import "log"
+
 type Runner struct {
 	Controller ControlChan
 	Error ControlChan
@@ -22,6 +24,8 @@ func NewRunner(longlife bool,datasize int,executor Function,dispather Function) 
 }
 
 func (r *Runner) StartDispatch(){
+	log.Println("22222222222222222222222222")
+
 	defer func() {
 		if !r.Longlife{
 			close(r.Controller)
@@ -34,24 +38,35 @@ func (r *Runner) StartDispatch(){
 	for{
 		select {
 		case c:= <- r.Controller:
+			log.Println("11111111111111111111111111111111111")
+			log.Printf("..........................%v",c)
 			if c==READY_DISPATCH{//开始分发
-				if err:= r.Dispather(r.Data);err!=nil{
+			log.Println("kaishi fenfa renwu")
+				err:= r.Dispather(r.Data)
+				if err!=nil{
+					log.Println(err)
 					r.Error <- CLOSE
-				}else {
+				}else{
 					r.Controller <- READY_EXECUTE
 				}
+
+
 			}
 
 			if c == READY_EXECUTE{
-				if err := r.Executor;err != nil{
+				err := r.Executor(r.Data)
+				if err != nil{
 
 					r.Error <- CLOSE
 				}else{
 					r.Controller <- READY_DISPATCH
 				}
+
+
 			}
 		case e:= <- r.Error:
 			if e == CLOSE{
+				log.Println("renwu wancheng")
 				return
 			}
 		default:
@@ -62,6 +77,8 @@ func (r *Runner) StartDispatch(){
 }
 
 func (r *Runner)Start(){
+
 	r.Controller <- READY_DISPATCH
+	log.Printf("kaishi fenfa %v",r.Controller)
 	r.StartDispatch()
 }
