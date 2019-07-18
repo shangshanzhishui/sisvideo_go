@@ -1,12 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
-	"os"
-
 	"sis_video_go/api/user"
+	"sis_video_go/session"
 )
 type middleWareHandler struct {
 	r *httprouter.Router
@@ -27,16 +25,17 @@ func (m middleWareHandler) ServeHTTP(w http.ResponseWriter, r *http.Request){
 func RegisterHandle() *httprouter.Router{
 	router := httprouter.New()
 	//router.POST("/user",CreateUser)
-	router.POST("/login",user.Login)
+	router.POST("/login",user.Register)
+
+	router.POST("/user/:username",user.Login)
+	router.GET("/user/:username",user.GetUserInfo)
+	router.GET("/videos/:video_id/comments",user.ShowComments)
+	router.POST("/videos/:video_id/comments",user.PostComments)
 	return router
 }
 
 func main(){
-	v,err := os.Open("./videos/123.rmvb")
-	if err != nil{
-		fmt.Print(err)
-	}
-	fmt.Println(v)
+	session.LoadAllSession()
 	r := RegisterHandle()
 	m := MiddleWareHandler(r)
 	http.ListenAndServe(":8080",m)

@@ -2,6 +2,13 @@ package video
 
 import (
 	"database/sql"
+	"encoding/json"
+	"github.com/julienschmidt/httprouter"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"sis_video_go/api/user"
+	"sis_video_go/common"
 	"sis_video_go/db"
 	"sis_video_go/utils"
 	"time"
@@ -31,7 +38,47 @@ func AddVideo(aid int,name string)(*Video_info,error){
 	defer stmt.Close()
 	return res,nil
 }
+type videoInfo struct {
+	Username  string
+	Video_name string
+}
+func AddVIdeoInfo(w http.ResponseWriter,r *http.Request,p httprouter.Params){
+	ok,err:=user.VaildUser(w,r)
+	if !ok{
+		common.JsonSucess(w,"",200,err.Error())
+		return
+	}
+	res,_ := ioutil.ReadAll(r.Body)
+	videoBody := &videoInfo{}
+	if err := json.Unmarshal(res,videoBody);err !=nil{
+		log.Println(err)
+		common.JsonFail(w,500,err.Error())
+		return
+	}
+	author_id,err :=user.GetUserId(videoBody.Username)
+	if err!=nil{
+		common.JsonFail(w,500,err.Error())
+		return
+	}
+	video_info ,err:=AddVideo(author_id,videoBody.Video_name)
+	if err!=nil{
+		common.JsonFail(w,500,err.Error())
+		return
+	}else{
+		common.JsonSucess(w,video_info,200,"ok")
+	}
 
+}
+
+func ListAllVideos(w http.ResponseWriter,r *http.Request,p httprouter.Params){
+	ok,err:=user.VaildUser(w,r)
+	if !ok{
+		common.JsonSucess(w,"",200,err.Error())
+		return
+	}
+	username := p.ByName("username")
+
+}
 
 func GetVideoInfo(id string) (*Video_info,error){
 	video_info := Video_info{}
@@ -63,4 +110,68 @@ func DeleteVideoInfo(id string) error{
 	}
 	defer stmt.Close()
 	return nil
+}
+
+func GetUserVideos(username string)([]map[string]string, error){
+	var video_name  string
+	var display_time string
+	var m map[string]string
+	lv:= []map[string]string{}
+	m =make(map[string]string)
+
+	author_id ,err := user.GetUserId(username)
+	if err!=nil{
+		return nil,err
+	}
+	stmt,err := db.Db.Prepare("select video_name,dispaly_time from video_info where author_id=?")
+	if  err!=nil{
+		return nil,err
+	}
+	rows,err := stmt.Query(author_id)
+	if  err!=nil{
+		return nil,err
+	}
+
+	for rows.Next(){
+		err:=rows.Scan(&video_name,&display_time)
+		if err != nil{
+			return nil,err
+		}
+		m["video_name"] = video_name
+		m["display_time"] = display_time
+		lv = append(lv,m)
+
+	}
+	return lv,nil
+}
+
+func GetAllVideos()([]map[string]string, error){
+	var video_name  string
+	var display_time string
+	var m map[string]string
+	lv:= []map[string]string{}
+	m =make(map[string]string)
+
+
+
+	stmt,err := db.Db.Prepare("select video_name,dispaly_time from video_info")
+	if  err!=nil{
+		return nil,err
+	}
+	rows,err := stmt.Query()
+	if  err!=nil{
+		return nil,err
+	}
+
+	for rows.Next(){
+		err:=rows.Scan(&video_name,&display_time)
+		if err != nil{
+			return nil,err
+		}
+		m["video_name"] = video_name
+		m["display_time"] = display_time
+		lv = append(lv,m)
+
+	}
+	return lv,nil
 }

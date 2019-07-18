@@ -38,11 +38,12 @@ func (r *Runner) StartDispatch(){
 	for{
 		select {
 		case c:= <- r.Controller:
-			log.Println("11111111111111111111111111111111111")
-			log.Printf("..........................%v",c)
+			//log.Println("11111111111111111111111111111111111")
+			//log.Printf("..........................%v",c)
 			if c==READY_DISPATCH{//开始分发
-			log.Println("kaishi fenfa renwu")
+			//log.Println("kaishi fenfa renwu")
 				err:= r.Dispather(r.Data)
+
 				if err!=nil{
 					log.Println(err)
 					r.Error <- CLOSE
@@ -66,7 +67,7 @@ func (r *Runner) StartDispatch(){
 			}
 		case e:= <- r.Error:
 			if e == CLOSE{
-				log.Println("renwu wancheng")
+				//log.Println("renwu wancheng")
 				return
 			}
 		default:

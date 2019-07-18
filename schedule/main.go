@@ -8,7 +8,7 @@ import (
 
 func RegisterHandler() *httprouter.Router{
 	router := httprouter.New()
-	router.GET("/video/:video_id",DelVideoRecord)
+	router.DELETE("/video/:video_id",DelVideoRecord)
 	return router
 }
 
