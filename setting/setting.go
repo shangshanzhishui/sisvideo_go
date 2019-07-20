@@ -18,6 +18,7 @@ var SessionExpired = int64(30 * 60 *1000)
 
 const (
 	VIDEO_DICTORY = "../../videos/" //shipinlujing
-	UPLOADE_MAX_SIZE = 1024 * 1024 *100
+	IMAGE_DICTORY = "../../images/"
+	UPLOADE_MAX_SIZE = 1024 * 1024 *1000
 )
 

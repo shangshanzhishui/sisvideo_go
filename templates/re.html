@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/statics/js/jquery.min.js" type="text/javascript"></script>
+</head>
+<body>
+    <form id="userInfo" >
+        <input name="username" id="username" type="text">
+        <input name="pwd" id="pwd" type="text">
+
+    </form>
+    <input type="button" name="提交" id="submit" onclick="upload();">
+
+<script>
+    function upload() {
+
+        var username = document.getElementById("username").value;
+        var pwd = document.getElementById("pwd").value;
+        var data={"username":username,"pwd":pwd};
+        jsonData = JSON.stringify(data);
+        $.ajax({
+            url:"/register",
+            type:"post",
+            contentType:"application/json;charset=utf-8",
+            data:jsonData,
+            dataType:"json",
+            success:function (data) {
+                alert(data.msg);
+            },
+            error:function (e) {
+                alert("上传失败")
+            }
+        });
+    };
+</script>
+</body>
+</html>

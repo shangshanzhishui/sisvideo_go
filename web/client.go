@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -44,7 +45,7 @@ func  request( b *ApiBody,w http.ResponseWriter,r *http.Request){
 		}
 		Myresponse(w,resp)
 	case http.MethodDelete:
-		req,_ := http.NewRequest("DELETE",b.Url,nil)
+		req,_ := http.NewRequest("DELETE",b.Url,bytes.NewBuffer([]byte(b.body)))
 		req.Header = r.Header
 		resp,err = client.Do(req)
 		if err != nil{

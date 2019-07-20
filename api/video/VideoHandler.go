@@ -7,10 +7,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"sis_video_go/api/comments"
 	"sis_video_go/api/user"
 	"sis_video_go/common"
 	"sis_video_go/db"
-	"sis_video_go/utils"
 	"time"
 )
 
@@ -21,16 +21,16 @@ type Video_info struct {
 	Display_time string `json:"display_time"`
 }
 
-func AddVideo(aid int,name string)(*Video_info,error){
-	id := utils.NewUUID()
+func AddVideo(id string,aid int,name string,video_path string,image_path string)(*Video_info,error){
+
 	t := time.Now()
 	ctime := t.Format("jan 02 2006,15:04:05")
 	stmt ,err := db.Db.Prepare(`insert into video_info 
-    (id ,author_id,video_name,display_time) values (?,?,?,?)`)
+    (id ,author_id,video_name,display_time,video_path,image_path) values (?,?,?,?,?,?)`)
 	if err != nil{
 		return nil,err
 	}
-	_, err = stmt.Exec(id,aid,name,ctime)
+	_, err = stmt.Exec(id,aid,name,ctime,video_path,image_path)
 	if err != nil{
 		return nil,err
 	}
@@ -38,47 +38,112 @@ func AddVideo(aid int,name string)(*Video_info,error){
 	defer stmt.Close()
 	return res,nil
 }
+
 type videoInfo struct {
 	Username  string
 	Video_name string
 }
-func AddVIdeoInfo(w http.ResponseWriter,r *http.Request,p httprouter.Params){
+
+//func AddVIdeoInfo(w http.ResponseWriter,r *http.Request,p httprouter.Params){
+//	ok,err:=user.VaildUser(w,r)
+//	if !ok{
+//		common.JsonSucess(w,"",200,err.Error())
+//		return
+//	}
+//	res,_ := ioutil.ReadAll(r.Body)
+//	videoBody := &videoInfo{}
+//	if err := json.Unmarshal(res,videoBody);err !=nil{
+//		log.Println(err)
+//		common.JsonFail(w,500,err.Error())
+//		return
+//	}
+//	author_id,err :=user.GetUserId(videoBody.Username)
+//	if err!=nil{
+//		common.JsonFail(w,500,err.Error())
+//		return
+//	}
+//	video_info ,err:=AddVideo(author_id,videoBody.Video_name,)
+//	if err!=nil{
+//		common.JsonFail(w,500,err.Error())
+//		return
+//	}else{
+//		common.JsonSucess(w,video_info,200,"ok")
+//	}
+//
+//}
+
+func ListUserAllVideos(w http.ResponseWriter,r *http.Request,p httprouter.Params){
+	//lv := []map[string]string{}
 	ok,err:=user.VaildUser(w,r)
 	if !ok{
 		common.JsonSucess(w,"",200,err.Error())
 		return
 	}
-	res,_ := ioutil.ReadAll(r.Body)
-	videoBody := &videoInfo{}
-	if err := json.Unmarshal(res,videoBody);err !=nil{
-		log.Println(err)
-		common.JsonFail(w,500,err.Error())
-		return
-	}
-	author_id,err :=user.GetUserId(videoBody.Username)
+	username := p.ByName("usernmae")
+
+	s,err:=GetUserVideos(username)
 	if err!=nil{
-		common.JsonFail(w,500,err.Error())
+		log.Printf("huoqu user All videos error")
+		common.JsonFail(w,500,"huoqu shipin liebiao shibai ")
 		return
 	}
-	video_info ,err:=AddVideo(author_id,videoBody.Video_name)
-	if err!=nil{
-		common.JsonFail(w,500,err.Error())
-		return
-	}else{
-		common.JsonSucess(w,video_info,200,"ok")
-	}
+	common.JsonSucess(w,s,200,"ok")
 
 }
 
 func ListAllVideos(w http.ResponseWriter,r *http.Request,p httprouter.Params){
+	//lv := []map[string]string{}
 	ok,err:=user.VaildUser(w,r)
 	if !ok{
 		common.JsonSucess(w,"",200,err.Error())
 		return
 	}
-	username := p.ByName("username")
+
+	s,err:=GetAllVideos()
+	if err!=nil{
+		log.Printf("huoqu All videos error")
+		common.JsonFail(w,500,"huoqu shipin liebiao shibai ")
+		return
+	}
+	common.JsonSucess(w,s,200,"ok")
 
 }
+
+type comment struct {
+	Video_id string
+	Author_id int
+	Content string
+}
+func PostComment(w http.ResponseWriter,r *http.Request,p httprouter.Params){
+	ok,err:=user.VaildUser(w,r)
+	if !ok{
+		common.JsonSucess(w,"",200,err.Error())
+		return
+	}
+	co := &comment{"",0,""}
+	reqBody,_ := ioutil.ReadAll(r.Body)
+	if err := json.Unmarshal(reqBody,co);err!= nil{
+		log.Println(err)
+		common.JsonFail(w,500,"评论 失败")
+		return
+	}
+
+	video_id := p.ByName("video_id")
+	comment,err:=comments.AddComment(video_id,co.Author_id,co.Content)
+	if err!=nil{
+		log.Println(err)
+		common.JsonFail(w,500,"评论 失败")
+		return
+	}else{
+		common.JsonSucess(w,*comment,200,"ok")
+	}
+
+
+
+
+
+}
+
 
 func GetVideoInfo(id string) (*Video_info,error){
 	video_info := Video_info{}
@@ -115,6 +180,8 @@ func DeleteVideoInfo(id string) error{
 func GetUserVideos(username string)([]map[string]string, error){
 	var video_name  string
 	var display_time string
+	image_path := ""
+	video_path := ""
 	var m map[string]string
 	lv:= []map[string]string{}
 	m =make(map[string]string)
@@ -123,7 +190,7 @@ func GetUserVideos(username string)([]map[string]string, error){
 	if err!=nil{
 		return nil,err
 	}
-	stmt,err := db.Db.Prepare("select video_name,dispaly_time from video_info where author_id=?")
+	stmt,err := db.Db.Prepare("select video_name,dispaly_time,image_path,video_path from video_info where author_id=?")
 	if  err!=nil{
 		return nil,err
 	}
@@ -133,12 +200,16 @@ func GetUserVideos(username string)([]map[string]string, error){
 	}
 
 	for rows.Next(){
-		err:=rows.Scan(&video_name,&display_time)
+		err:=rows.Scan(&video_name,&display_time,&image_path,&video_path)
 		if err != nil{
 			return nil,err
 		}
 		m["video_name"] = video_name
 		m["display_time"] = display_time
+		m["image_path"] = image_path
+		m["video_path"] = video_path
+
+
 		lv = append(lv,m)
 
 	}
@@ -147,14 +218,18 @@ func GetUserVideos(username string)([]map[string]string, error){
 
 func GetAllVideos()([]map[string]string, error){
 	var video_name  string
+	var author_id int
 	var display_time string
+	var username string
 	var m map[string]string
+	image_path := ""
+	video_path := ""
 	lv:= []map[string]string{}
 	m =make(map[string]string)
 
 
 
-	stmt,err := db.Db.Prepare("select video_name,dispaly_time from video_info")
+	stmt,err := db.Db.Prepare("select author_id,video_name,dispaly_time,image_path,video_path from video_info")
 	if  err!=nil{
 		return nil,err
 	}
@@ -164,12 +239,19 @@ func GetAllVideos()([]map[string]string, error){
 	}
 
 	for rows.Next(){
-		err:=rows.Scan(&video_name,&display_time)
+		err:=rows.Scan(&author_id,&video_name,&display_time,&image_path,&video_path)
 		if err != nil{
 			return nil,err
 		}
+		username,err = user.GetUsername(author_id)
+		if err!=nil{
+			return nil,err
+		}
+		m["username"] = username
 		m["video_name"] = video_name
 		m["display_time"] = display_time
+		m["image_path"] = image_path
+		m["video_path"] = video_path
 		lv = append(lv,m)
 
 	}

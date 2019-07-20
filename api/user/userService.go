@@ -7,7 +7,7 @@ import (
   	"log"
 	"net/http"
 	"sis_video_go/db"
-	session2 "sis_video_go/session"
+	"sis_video_go/session/sessionServer"
 )
 
 type User struct {
@@ -16,14 +16,14 @@ type User struct {
 	Login_time string `json:"login_time"`
 }
 
-func AddUser(usernam string,pw string) error {
-	fmt.Print(usernam,pw)
+func AddUser(username string,pwd string) error {
+	fmt.Print(username,pwd)
 	stmt,err := db.Db.Prepare("insert into user (username,pwd) values (?,?)")
 	if err != nil{
 		fmt.Println(err)
 		return err
 	}
-	_,err = stmt.Exec("nihao","123")
+	_,err = stmt.Exec(username,pwd)
 	if err != nil{
 		return nil
 	}
@@ -77,6 +77,21 @@ func GetUserId(username string) (int,error){
 	return id,nil
 }
 
+func GetUsername(id int) (string,error){
+	var username string
+	stmt ,err := db.Db.Prepare("select username from user where id = ?")
+	if err != nil{
+		log.Println(err)
+		return "",err
+	}
+	err = stmt.QueryRow(id).Scan(&username)
+	if err != nil{
+		return "",err
+	}
+	defer stmt.Close()
+	return username,nil
+}
+
 func GetUserBySessionId(sid string) (string,error ){
 	stmt,err := db.Db.Prepare("select author_id from sessions where session_id is ?")
 	if err != nil{
@@ -112,7 +127,7 @@ func VaildUser(w http.ResponseWriter,r *http.Request) (bool,error){
 	}
 
 	session_id := session.Value
-	_,ok := session2.SessionMap.Load(session_id)
+	_,ok := sessionServer.SessionMap.Load(session_id)
 	if ok{
 		return true,nil
 	}else{

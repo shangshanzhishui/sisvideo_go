@@ -39,7 +39,7 @@ func JsonSucess(w http.ResponseWriter,v interface{},code int,msg string) error{
 	if err != nil{
 		return err
 	}
-	//w.WriteHeader(code)
+	w.Header().Set("Content-Type","application/json")
 	w.Write(data)
 	return nil
 }
@@ -52,7 +52,7 @@ func JsonFail(w http.ResponseWriter,code int,msg string) error{
 	if err != nil{
 		return err
 	}
-	//w.WriteHeader(code)
+	w.Header().Set("Content-Type","application/json")
 	w.Write(data)
 	return nil
 }

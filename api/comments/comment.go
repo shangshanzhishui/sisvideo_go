@@ -8,11 +8,11 @@ import (
 )
 
 type Comment struct {
-	Id           string
-	Video_id     string
-	Author_id    int
-	Content      string
-	Display_time string
+	Id           string `json:"id"`
+	Video_id     string `json:"video_id"`
+	Author_id    int    `json:"author_id"`
+	Content      string  `json:"content"`
+	Display_time string  `json:"display_time"`
 }
 
 func AddComment(vid string,aid int,content string) (*Comment,error){
@@ -54,11 +54,11 @@ func GetComment(id string) (*Comment,error){
 
 
 type Comment2 struct {
-	Id           string
-	Video_id     string
-	Author_name  string
-	Content      string
-	Display_time string
+	Id           string `json:"id"`
+	Video_id     string `json:"video_id"`
+	Author_name  string `json:"author_name"`
+	Content      string `json:"content"`
+	Display_time string `json:"display_time"`
 }
 func GetComments(vid string,start,end int)([]*Comment2,error){
 

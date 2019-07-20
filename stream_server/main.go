@@ -31,12 +31,12 @@ func (m streamMiddleWareHandle) ServeHTTP(w http.ResponseWriter, r *http.Request
 func registerHandler() *httprouter.Router{
 	router := httprouter.New()
 	router.GET("/videos/:video_id",StreamHandler)
-	router.POST("/videos/:video_id",UpdateHandler)
+	router.POST("/video/:username",UpdateHandler)
 	return router
 }
 
 func main(){
 	r:= registerHandler()
 	//sm:= NewStreamMiddleWareHandle(r,2)
-	http.ListenAndServe("10.13.165.33	:9090",r)
+	http.ListenAndServe(":9002",r)
 }

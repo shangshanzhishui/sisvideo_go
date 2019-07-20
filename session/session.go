@@ -3,12 +3,11 @@ package session
 import (
 	"database/sql"
 	"log"
-	"sis_video_go/api/user"
 	"sis_video_go/db"
+	"sis_video_go/session/sessionServer"
 	"sis_video_go/setting"
 	"sis_video_go/utils"
 	"strconv"
-	"sync"
 	"time"
 )
 
@@ -25,38 +24,24 @@ type Session2 struct {
 }
 
 
-var SessionMap *sync.Map
-func init(){
-	SessionMap = &sync.Map{}
-}
 
 func CreateSessionId(author_id int) string{
 	id := utils.NewUUID()
 	ctime := time.Now().UnixNano() / 1000000
 	ttl := strconv.FormatInt(ctime + setting.SessionExpired,10)
 	session := &Session{Sesion_id:id,Author_id:author_id,TTL:ttl}
-	SessionMap.Store(id,session)
+	sessionServer.SessionMap.Store(id,session)
+
 	AddSession(id,ttl,author_id)
 	return id
 }
 
-func CreateSessionIdByUname(Username string) (string,error){
-	id := utils.NewUUID()
-	ctime := time.Now().UnixNano() / 1000000
-	ttl := strconv.FormatInt(ctime + setting.SessionExpired,10)
-	author_id,err := user.GetUserId(Username)
-	if err != nil{
-		return "",err
-	}
-	session := &Session{Sesion_id:id,Author_id:author_id,TTL:ttl}
-	SessionMap.Store(id,session)
-	AddSession(id,ttl,author_id)
-	return id,nil
-}
+
+
 
 
 func SessionIsExpired(id string)bool{
-	session,ok := SessionMap.Load(id)
+	session,ok := sessionServer.SessionMap.Load(id)
 	if ok{
 		ctime := time.Now().UnixNano() / 1000000
 		ttl,_ := strconv.ParseInt(session.(*Session).TTL,10,64)
@@ -69,7 +54,7 @@ func SessionIsExpired(id string)bool{
 }
 
 func DeleteSession(sid string){
-	SessionMap.Delete(sid)
+	sessionServer.SessionMap.Delete(sid)
 	DeleteSessionDB(sid)
 }
 
@@ -152,7 +137,7 @@ func LoadAllSession(){
 		session2.Author_id = session.Author_id
 		session2.Sesion_id = session.Sesion_id
 		session2.TTL = ttl
-		SessionMap.Store(session2.Sesion_id,session2)
+		sessionServer.SessionMap.Store(session2.Sesion_id,session2)
 		log.Printf("session_id:%v,ttl:%v",session2.Sesion_id,ttl)
 	}
 	return

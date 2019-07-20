@@ -8,7 +8,7 @@ import (
 	"log"
 	"net/http"
 	"sis_video_go/common"
-	"sis_video_go/session"
+	"sis_video_go/session/sessionServer"
 )
 type user2 struct {
 	Username string `json:"username"`
@@ -20,7 +20,7 @@ func Register(w http.ResponseWriter,r *http.Request,p httprouter.Params){
 
 	user := &user2{}
 	if err := json.Unmarshal(res,user); err != nil{
-
+		log.Printf("zhuce shibai1:%v",err)
 		common.JsonFail(w,500,"注册失败")
 		fmt.Println(user)
 		return
@@ -30,18 +30,22 @@ func Register(w http.ResponseWriter,r *http.Request,p httprouter.Params){
 
 
 	if err := AddUser(user.Username,user.Pwd);err != nil{
+		log.Printf("tianjiayonghu shibai:%v",err)
 		common.JsonFail(w,500,"注册失败")
 		return
 	}
 	author_id,err := GetUserId(user.Username)
 	if err != nil{
+		log.Printf("zhuce shibai:%v",err)
 		common.JsonFail(w,500,"注册失败")
 		return
 	}
-	id := session.CreateSessionId(author_id)
+	id := sessionServer.CreateSessionId(author_id)
 	data := []map[string]string{{"id":id}}
 	cookie := http.Cookie{Name:"session",Value:id}
 	http.SetCookie(w,&cookie)
+	cookie2 := http.Cookie{Name:"username",Value:user.Username}
+	http.SetCookie(w,&cookie2)
 	common.JsonSucess(w,data,200,"注册成功")
 
 	return
@@ -57,19 +61,27 @@ func Login(w http.ResponseWriter,r *http.Request,p httprouter.Params){
 		common.JsonFail(w,500,"denglu shibai")
 		return
 	}
-	username := p.ByName("username")
+	username := ubody.Username
 	pwd,err := GetUser(username)
 	if err !=nil || len(pwd) ==0 || pwd != ubody.Pwd{
 		log.Println(err)
 		common.JsonFail(w,500,"denglu shibai")
 		return
 	}
-	session_id,err := session.CreateSessionIdByUname(ubody.Username)
+	dbpwd,err := GetUser(username)
+	if dbpwd!= pwd{
+		common.JsonFail(w,500," 密码错误")
+	}
+	session_id,err := sessionServer.CreateSessionIdByUname(ubody.Username)
 	if err!=nil{
 		log.Println(err)
 		common.JsonFail(w,500,"denglu shibai")
 		return
 	}
+	cookie := http.Cookie{Name:"session",Value:session_id}
+	http.SetCookie(w,&cookie)
+	cookie2 := http.Cookie{Name:"username",Value:username}
+	http.SetCookie(w,&cookie2)
 	common.JsonSucess(w,session_id,200,"ok")
 }
 
