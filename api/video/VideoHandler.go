@@ -72,24 +72,24 @@ type videoInfo struct {
 //
 //}
 
-func ListUserAllVideos(w http.ResponseWriter,r *http.Request,p httprouter.Params){
-	//lv := []map[string]string{}
-	ok,err:=user.VaildUser(w,r)
-	if !ok{
-		common.JsonSucess(w,"",200,err.Error())
-		return
-	}
-	username := p.ByName("usernmae")
-
-	s,err:=GetUserVideos(username)
-	if err!=nil{
-		log.Printf("huoqu user All videos error")
-		common.JsonFail(w,500,"huoqu shipin liebiao shibai ")
-		return
-	}
-	common.JsonSucess(w,s,200,"ok")
-
-}
+//func ListUserAllVideos(w http.ResponseWriter,r *http.Request,p httprouter.Params){
+//	//lv := []map[string]string{}
+//	ok,err:=user.VaildUser(w,r)
+//	if !ok{
+//		common.JsonSucess(w,"",200,err.Error())
+//		return
+//	}
+//	username := p.ByName("usernmae")
+//
+//	s,err:=GetUserVideos(username)
+//	if err!=nil{
+//		log.Printf("huoqu user All videos error")
+//		common.JsonFail(w,500,"huoqu shipin liebiao shibai ")
+//		return
+//	}
+//	common.JsonSucess(w,s,200,"ok")
+//
+//}
 
 func ListAllVideos(w http.ResponseWriter,r *http.Request,p httprouter.Params){
 	//lv := []map[string]string{}
@@ -101,7 +101,7 @@ func ListAllVideos(w http.ResponseWriter,r *http.Request,p httprouter.Params){
 
 	s,err:=GetAllVideos()
 	if err!=nil{
-		log.Printf("huoqu All videos error")
+		log.Printf("huoqu All videos error:%v",err)
 		common.JsonFail(w,500,"huoqu shipin liebiao shibai ")
 		return
 	}
@@ -177,14 +177,14 @@ func DeleteVideoInfo(id string) error{
 	return nil
 }
 
-func GetUserVideos(username string)([]map[string]string, error){
+func GetUserVideos_sheqi(username string)([]map[string]string, error){
 	var video_name  string
 	var display_time string
 	image_path := ""
 	video_path := ""
 	var m map[string]string
-	lv:= []map[string]string{}
-	m =make(map[string]string)
+	var lv []map[string]string
+
 
 	author_id ,err := user.GetUserId(username)
 	if err!=nil{
@@ -211,25 +211,44 @@ func GetUserVideos(username string)([]map[string]string, error){
 
 
 		lv = append(lv,m)
+		log.Println(lv)
 
 	}
 	return lv,nil
+
 }
 
-func GetAllVideos()([]map[string]string, error){
-	var video_name  string
-	var author_id int
-	var display_time string
-	var username string
-	var m map[string]string
-	image_path := ""
-	video_path := ""
-	lv:= []map[string]string{}
-	m =make(map[string]string)
+type video_info1 struct {
+	Video_name string
+	Author_id int
+	Display_time string
+	Image_path string
+	Video_path string
+}
+
+type video_info2 struct {
+	Author_id int
+	Video_name string
+	Username string
+	Display_time string
+	Image_path string
+	Video_path string
+}
+func GetAllVideos()([]video_info2, error){
+	//var video_name  string
+	//var author_id int
+	//var display_time string
+	//var username string
+	 //m :=map[string]string{}
+	//image_path := ""
+	//video_path := ""
+	lv:= []video_info1{}
+	lv2 := []video_info2{}
+	video := video_info1{}
+	video2 := video_info2{}
 
 
-
-	stmt,err := db.Db.Prepare("select author_id,video_name,dispaly_time,image_path,video_path from video_info")
+	stmt,err := db.Db.Prepare("select author_id,video_name,display_time,image_path,video_path from video_info")
 	if  err!=nil{
 		return nil,err
 	}
@@ -239,21 +258,103 @@ func GetAllVideos()([]map[string]string, error){
 	}
 
 	for rows.Next(){
-		err:=rows.Scan(&author_id,&video_name,&display_time,&image_path,&video_path)
+		err:=rows.Scan(&video.Author_id,&video.Video_name,&video.Display_time,&video.Image_path,&video.Video_path)
 		if err != nil{
 			return nil,err
 		}
-		username,err = user.GetUsername(author_id)
+
 		if err!=nil{
 			return nil,err
 		}
-		m["username"] = username
-		m["video_name"] = video_name
-		m["display_time"] = display_time
-		m["image_path"] = image_path
-		m["video_path"] = video_path
-		lv = append(lv,m)
+		//&video2.Username = &username
+		//&video2.Video_path=&video.Video_path
+		//&video2.Image_path=&video.Image_path
+		//&video2.Display_time=&video.Display_time
+		//&video2.Video_name=&video.Video_name
+		//m["username"] = video.Author_id
+		//m["video_name"] = video.Video_name
+		//m["display_time"] = video.Display_time
+		//m["image_path"] = video.Image_path
+		//m["video_path"] = video.Video_path
+		lv = append(lv,video)
 
 	}
-	return lv,nil
+	//var s int
+	for i := range lv{
+		func(s int){
+			username,_ := user.GetUsername(lv[s].Author_id)
+			video2.Username = username
+			video2.Author_id=lv[s].Author_id
+			video2.Video_path=lv[s].Video_path
+			video2.Image_path=lv[s].Image_path
+			video2.Display_time=lv[s].Display_time
+			video2.Video_name=lv[s].Video_name
+			lv2 = append(lv2,video2)
+		}(i)
+
+	}
+	//log.Println(lv)
+	return lv2,nil
+}
+func GetUserVideos(aid int)([]video_info2, error){
+	//var video_name  string
+	//var author_id int
+	//var display_time string
+	//var username string
+	//m :=map[string]string{}
+	//image_path := ""
+	//video_path := ""
+	lv:= []video_info1{}
+	lv2 := []video_info2{}
+	video := video_info1{}
+	video2 := video_info2{}
+
+
+	stmt,err := db.Db.Prepare("select author_id,video_name,display_time,image_path,video_path from video_info where author_id = ?")
+	if  err!=nil{
+		return nil,err
+	}
+	rows,err := stmt.Query(aid)
+	if  err!=nil{
+		return nil,err
+	}
+
+	for rows.Next(){
+		err:=rows.Scan(&video.Author_id,&video.Video_name,&video.Display_time,&video.Image_path,&video.Video_path)
+		if err != nil{
+			return nil,err
+		}
+
+		if err!=nil{
+			return nil,err
+		}
+		//&video2.Username = &username
+		//&video2.Video_path=&video.Video_path
+		//&video2.Image_path=&video.Image_path
+		//&video2.Display_time=&video.Display_time
+		//&video2.Video_name=&video.Video_name
+		//m["username"] = video.Author_id
+		//m["video_name"] = video.Video_name
+		//m["display_time"] = video.Display_time
+		//m["image_path"] = video.Image_path
+		//m["video_path"] = video.Video_path
+		lv = append(lv,video)
+
+	}
+	//var s int
+	for i := range lv{
+		func(s int){
+			username,_ := user.GetUsername(lv[s].Author_id)
+			video2.Username = username
+			video2.Author_id=lv[s].Author_id
+			video2.Video_path=lv[s].Video_path
+			video2.Image_path=lv[s].Image_path
+			video2.Display_time=lv[s].Display_time
+			video2.Video_name=lv[s].Video_name
+			lv2 = append(lv2,video2)
+		}(i)
+
+	}
+	//log.Println(lv)
+	return lv2,nil
 }

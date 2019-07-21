@@ -8,7 +8,7 @@ import (
 )
 type JsonRes struct {
 	Msg   string `json:"msg"`
-	Response string `json:"response"`
+	Status string `json:"status"`
 	Data     interface{} `json:"data"`
 	Error    int `json:"error"`
 	Nums     int `json:"nums"`
@@ -16,7 +16,7 @@ type JsonRes struct {
 
 var jsonSucess = JsonRes{
 	Msg: "",
-	Response:"ok",
+	Status:"ok",
 	Data:0,
 	Error:0,
 	Nums:0,
@@ -25,7 +25,7 @@ var jsonSucess = JsonRes{
 
 var jsonFail = JsonRes{
 	Msg: "",
-	Response:"fail",
+	Status:"fail",
 	Data:0,
 	Error:0,
 	Nums:0,

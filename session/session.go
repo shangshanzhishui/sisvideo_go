@@ -106,6 +106,7 @@ func DeleteSessionDB(sid string)error{
 
 
 func LoadAllSession(){
+	log.Println("123")
 	//m := &sync.Map{}
 	session2 := &Session2{}
 	session := &Session{}
@@ -122,7 +123,7 @@ func LoadAllSession(){
 	}
 
 	for rows.Next(){
-		err := rows.Scan(session.Sesion_id,session.Author_id,session.TTL)
+		err := rows.Scan(&session.Sesion_id,&session.Author_id,&session.TTL)
 		if err != nil{
 
 			log.Println(err)
@@ -138,7 +139,9 @@ func LoadAllSession(){
 		session2.Sesion_id = session.Sesion_id
 		session2.TTL = ttl
 		sessionServer.SessionMap.Store(session2.Sesion_id,session2)
+
 		log.Printf("session_id:%v,ttl:%v",session2.Sesion_id,ttl)
+		log.Println(sessionServer.SessionMap.Load(session2.Sesion_id))
 	}
 	return
 

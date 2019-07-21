@@ -2,6 +2,7 @@ package comments
 
 import (
 	"database/sql"
+	"log"
 	"sis_video_go/db"
 	"sis_video_go/utils"
 	"time"
@@ -55,19 +56,21 @@ func GetComment(id string) (*Comment,error){
 
 type Comment2 struct {
 	Id           string `json:"id"`
-	Video_id     string `json:"video_id"`
 	Author_name  string `json:"author_name"`
 	Content      string `json:"content"`
 	Display_time string `json:"display_time"`
 }
-func GetComments(vid string,start,end int)([]*Comment2,error){
+func GetComments(vid string)([]Comment2,error){
 
-	comments := &Comment2{}
-	var res []*Comment2
-	stmt,err := db.Db.Prepare(`select comments.id ,user.username,comments.content,dispaly_time from comments
-					                  inner join user on comments.author_id = user.id
-					                  where comments.video_id=? and comments.time>from_unixtime(?) and comments.time <= from_unixtime(?) `)
-	rows,err := stmt.Query(vid,start,end)
+	comments := Comment2{}
+	var res []Comment2
+	stmt,err := db.Db.Prepare("select comments.id ,user.username,comments.content,display_time from comments inner join user on comments.author_id=user.id where comments.video_id = ?")
+	//"select comments.id ,user.username,comments.content,display_time from comments inner join user on comments.author_id=user.id where comments.video_id = ?"
+	//log.Printf("shujulianjie:%v",stmt)
+	if stmt ==nil{
+		return nil,nil
+	}
+	rows,err := stmt.Query(vid)
 	if err != nil{
 		return nil, err
 	}
@@ -78,6 +81,11 @@ func GetComments(vid string,start,end int)([]*Comment2,error){
 		res  = append(res,comments)
 	}
 	defer stmt.Close()
+	if len(res) ==0{
+		return nil,nil
+	}
+	log.Println("123")
+	log.Println(res)
 	return res,nil
 }
 

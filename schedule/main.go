@@ -8,12 +8,12 @@ import (
 
 func RegisterHandler() *httprouter.Router{
 	router := httprouter.New()
-	router.DELETE("/video/:video_id",DelVideoRecord)
+	router.DELETE("/videos/:video_id/user/:athour_id",DelVideoRecord)
 	return router
 }
 
 func main(){
 	go taskruner.WorkStart()
 	r := RegisterHandler()
-	http.ListenAndServe(":9000",r)
+	http.ListenAndServe(":9003",r)
 }

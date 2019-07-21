@@ -1828,9 +1828,9 @@ textarea:focus {
 }
 
 .module .right {
-    width: 962px;
-    height: 100%;
-    float: right
+    /*width: 962px;*/
+    /*height: 100%;*/
+    /*float: right*/
 }
 
 .module .box img {

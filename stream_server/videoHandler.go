@@ -12,6 +12,7 @@ import (
 	"sis_video_go/common"
 	"sis_video_go/setting"
 	"sis_video_go/utils"
+	"strings"
 	"time"
 )
 
@@ -22,12 +23,12 @@ func StreamHandler(w http.ResponseWriter,r *http.Request,p httprouter.Params){
 	fmt.Println(Video_dictory)
 	//fmt.Println(video_id)
 	video ,err := os.Open(Video_dictory)
-	log.Print(video)
+	//log.Print(video)
 	if err != nil{
 		common.JsonFail(w,500,"文件出错")
 		log.Println(err)
 	}
-	//w.Header().Set("Content-Type","video/rmvb")
+	w.Header().Set("Content-Type","video/mp4")
 	http.ServeContent(w,r,"",time.Now(),video)
 	defer video.Close()
 }
@@ -44,11 +45,17 @@ func UpdateHandler(w http.ResponseWriter,r *http.Request,p httprouter.Params){
 	//}
 	image_id := utils.NewUUID()
 	video_id := utils.NewUUID()
-	image_path := setting.IMAGE_DICTORY + image_id
-	video_path := setting.VIDEO_DICTORY + video_id
+
+
 	//res,err:=ioutil.ReadAll(r.Body)
 	file,_ ,err := r.FormFile("file")
-	image,_,err := r.FormFile("image")
+	image,imageHead,err := r.FormFile("image")
+	imageName := imageHead.Filename
+	imageEnd := strings.Split(imageName,".")[1]
+	image_path := setting.IMAGE_DICTORY + image_id+"."+imageEnd
+	image_url := "/statics/video_image/"+image_id+"."+imageEnd
+	video_path :=  setting.VIDEO_DICTORY+ video_id
+	video_url := "/videos/"+video_id
 	video_name:= r.PostForm["name"][0]
 
 	log.Println(video_name)
@@ -79,7 +86,13 @@ func UpdateHandler(w http.ResponseWriter,r *http.Request,p httprouter.Params){
 		common.JsonFail(w,http.StatusInternalServerError,"shangchuanchuchuo")
 		return
 	}
-	video.AddVideo(video_id,athour_id,video_name,video_path,image_path)
+	_,err=video.AddVideo(video_id,athour_id,video_name,video_url,image_url)
+	if err !=nil{
+		log.Printf("添加数据库:%v",err)
+		common.JsonFail(w,http.StatusInternalServerError,"tianjiashujukuchucuo")
+	}
+	defer file.Close()
+	defer image.Close()
 	w.WriteHeader(http.StatusCreated)
 	common.JsonSucess(w,"ok",200,"shangchuanchenggong")
 }

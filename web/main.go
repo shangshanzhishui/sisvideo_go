@@ -12,10 +12,19 @@ func RegisterHandler() *httprouter.Router{
 	router.GET("/register",RegiserHandler)
 	router.GET("/login",loginHandler)
 	router.GET("/upload/:username",uploadHandler)
+	router.GET("/video/:video_id",proxyStreamHandler)
+	router.GET("/videos/:video_id",videoHandler)
+	router.GET("/user/:username",MyHomeHandler)
+
+	//router.GET("/videos/video_id/comments",videoCommentHandler)
+
 
 	router.POST("/register",proxyServeHandler)
 	router.POST("/login",proxyServeHandler)
 	router.POST("/video/:username",proxyStreamHandler)
+	router.POST("/videos/:video_id/comment",proxyServeHandler)
+	router.DELETE("/videos/:video_id/comment",proxyServeHandler)
+	router.DELETE("/videos/:video_id/user/:athour_id",proxyScheHandler)
 
 	//代理stream——server
 	router.POST("/videos",proxyStreamHandler)
@@ -28,6 +37,6 @@ func RegisterHandler() *httprouter.Router{
 }
 func main(){
 	r := RegisterHandler()
-	http.ListenAndServe("10.13.165.33:9000",r)
+	http.ListenAndServe("10.13.165.25:9000",r)
 }
 

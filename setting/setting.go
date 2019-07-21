@@ -17,8 +17,8 @@ var Mysql_Password = "12345678"
 var SessionExpired = int64(30 * 60 *1000)
 
 const (
-	VIDEO_DICTORY = "../../videos/" //shipinlujing
-	IMAGE_DICTORY = "../../images/"
+	VIDEO_DICTORY = "../videos/" //shipinlujing
+	IMAGE_DICTORY = "../templates/video_image/"
 	UPLOADE_MAX_SIZE = 1024 * 1024 *1000
 )
 

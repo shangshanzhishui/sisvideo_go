@@ -1,44 +1,196 @@
+<!--
+Author: W3layouts
+Author URL: http://w3layouts.com
+License: Creative Commons Attribution 3.0 Unported
+License URL: http://creativecommons.org/licenses/by/3.0/
+-->
 <!DOCTYPE HTML>
 <html>
 <head>
-<title>Home</title>
-<!-- Custom Theme files -->
-<link href="/statics/css/style.css" rel="stylesheet" type="text/css" media="all"/>
-<!-- Custom Theme files -->
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
-<meta name="keywords" content="Login form web template, Sign up Web Templates, Flat Web Templates, Login signup Responsive web template, Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design" />
-<!--Google Fonts-->
-<link href='http://fonts.useso.com/css?family=Roboto:500,900italic,900,400italic,100,700italic,300,700,500italic,100italic,300italic,400' rel='stylesheet' type='text/css'>
-<link href='http://fonts.useso.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
-<!--Google Fonts-->
+	<title>{{.Username}}视频 | Home :: w3layouts</title>
+	<link href="/statics/css/style1.css" rel='stylesheet' type='text/css' />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="shortcut icon" type="image/x-icon" href="/statics/images/fav-icon.png" />
+	<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+	</script>
+	<!----webfonts---->
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800' rel='stylesheet' type='text/css'>
+			<!----//webfonts---->
+			<!-- Global CSS for the page and tiles -->
+			<link rel="stylesheet" href="/statics/css/main.css">
+			<!-- //Global CSS for the page and tiles -->
+			<!---start-click-drop-down-menu----->
+			<script src="/statics/js/jquery.min.js"></script>
+	<!----start-dropdown--->
+	<script type="text/javascript">
+		var $ = jQuery.noConflict();
+		$(function() {
+			$('#activator').click(function(){
+				$('#box').animate({'top':'0px'},500);
+			});
+			$('#boxclose').click(function(){
+				$('#box').animate({'top':'-700px'},500);
+			});
+		});
+		$(document).ready(function(){
+			//Hide (Collapse) the toggle containers on load
+			$(".toggle_container").hide();
+			//Switch the "Open" and "Close" state per click then slide up/down (depending on open/close state)
+			$(".trigger").click(function(){
+				$(this).toggleClass("active").next().slideToggle("slow");
+				return false; //Prevent the browser jump to the link anchor
+			});
+
+		});
+	</script>
+	<!----//End-dropdown--->
+	<!---//End-click-drop-down-menu----->
 </head>
 <body>
-<div class="login">
-	<h2>{{.Name}}</h2>
-	<div class="login-top">
-		<h1>LOGIN FORM</h1>
-		<form>
-			<input type="text" value="User Id" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'User Id';}">
-			<input type="password" value="password" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'password';}">
-	    </form>
-	    <div class="forgot">
-	    	<input type="submit" value="Login" >
-	    </div>
-		<div class="forgot1">
 
-			<input type="submit" value="register" >
+<div class="header">
+	<div class="wrap">
+		<div class="logo">
+			<a href="index.html"><img src="/statics/images/logo.png" title="pinbal" /></a>
 		</div>
+		<div class="nav-icon">
+			<a href="#" class="right_bt" id="activator"><span> </span> </a>
+		</div>
+		<div class="box" id="box">
+			<div class="box_content">
+				<div class="box_content_center">
+					<div class="form_content">
+						<div class="menu_box_list">
+							<ul>
+
+								<li><a href="/"><span>首页</span></a></li>
+								<div class="clear"> </div>
+							</ul>
+						</div>
+						<a class="boxclose" id="boxclose"> <span> </span></a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="top-searchbar">
+			<form>
+				<input type="text" /><input type="submit" value="" />
+			</form>
+		</div>
+		<div class="userinfo">
+			<div class="user">
+				<ul>
+					<li><a href="#"><img src="/statics/images/user-pic.png" title="user-name" /><span>Ipsum</span></a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="clear"> </div>
 	</div>
-	<div class="login-bottom">
-		<h3>New User &nbsp;<a href="#">Register</a>&nbsp Here</h3>
-	</div>
-</div>	
-<div class="copyright">
-	<p>Copyright &copy; 2015.Company name All rights reserved.<a target="_blank" href="http://www.cssmoban.com/">&#x7F51;&#x9875;&#x6A21;&#x677F;</a> - More Templates <a href="http://www.cssmoban.com/" target="_blank" title="模板之家">模板之家</a></p>
 </div>
 
+<div class="content">
+	<div class="wrap">
+		<div id="main" role="main">
+			<ul id="tiles">
+				<!-- These are our grid blocks -->
+
+				{{range .}}
+				<li onclick="location.href={{.Video_path}};">
+					<img src={{.Image_path}} width="200" height="200">
+					<div class="post-info">
+						<div class="post-basic-info">
+							<h3><a href={{.Video_path}}>{{.Video_name}}</a></h3>
+							<h3><a href="/user/{{.Author_id}}">用户:{{.Username}}</a></h3>
+
+							<p>上傳時間:{{.Display_time}}</p>
+							<button value="删除" onclick="del();" >删除</button>
+						</div>
+						<div class="post-info-rate-share">
+							<div class="rateit">
+								<span> </span>
+							</div>
+							<div class="post-share">
+								<span> </span>
+							</div>
+							<div class="clear"> </div>
+						</div>
+					</div>
+				</li>
+				{{end}}
+				<!-- End of grid blocks -->
+			</ul>
+		</div>
+	</div>
+</div>
+
+<script src="/statics/js/jquery.imagesloaded.js"></script>
+<script src="/statics/js/jquery.wookmark.js"></script>
+<script type="text/javascript">
+	(function ($){
+		var $tiles = $('#tiles'),
+				$handler = $('li', $tiles),
+				$main = $('#main'),
+				$window = $(window),
+				$document = $(document),
+				options = {
+					autoResize: true, // This will auto-update the layout when the browser window is resized.
+					container: $main, // Optional, used for some extra CSS styling
+					offset: 20, // Optional, the distance between grid items
+					itemWidth:280 // Optional, the width of a grid item
+				};
+		/**
+		 * Reinitializes the wookmark handler after all images have loaded
+		 */
+		function applyLayout() {
+			$tiles.imagesLoaded(function() {
+				// Destroy the old handler
+				if ($handler.wookmarkInstance) {
+					$handler.wookmarkInstance.clear();
+				}
+
+				// Create a new layout handler.
+				$handler = $('li', $tiles);
+				$handler.wookmark(options);
+			});
+		}
+		/**
+		 * When scrolled all the way to the bottom, add more tiles
+		 */
+
+
+		// Call the layout function for the first time
+		applyLayout();
+
+		// Capture scroll event.
+
+	})(jQuery);
+
+	function del() {
+		$.ajax({
+			cache:false,
+			type:"DELETE",
+			url:"{{.Video_path}}/{{.Author_id}}",
+			data:jsonData,
+			dataType:"json",
+			async:false,
+			beforeSend:function (xhr,settings) {
+				{{/*xhr.setRequestHeader("X-CSRFToken","{{ csrf_token }}")*/}}
+			},
+			success:function (data) {
+
+				if (data.status == "fail"){
+						alert(data.msg);
+				}else if(data.status == "ok"){
+					alert(data.msg);
+					window.location.reload();
+				}
+			}
+	})
+</script>
+
+<div class="footer">
+	<p>Design by <a href="http://w3layouts.com/">W3layouts</a></p>
+</div>
 
 </body>
 </html>

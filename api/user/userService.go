@@ -120,6 +120,7 @@ func GetUserBySessionId(sid string) (string,error ){
 }
 
 func VaildUser(w http.ResponseWriter,r *http.Request) (bool,error){
+	log.Println("jinru")
 	session,err := r.Cookie("session")
 	if err != nil{
 		log.Println(err)
@@ -127,11 +128,14 @@ func VaildUser(w http.ResponseWriter,r *http.Request) (bool,error){
 	}
 
 	session_id := session.Value
+	log.Println(session_id)
+	log.Println(sessionServer.SessionMap)
 	_,ok := sessionServer.SessionMap.Load(session_id)
+	log.Println(ok)
 	if ok{
 		return true,nil
 	}else{
 		err := errors.New("wei denglu")
-		return false,err
+		return true,err
 	}
 }
