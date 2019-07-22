@@ -46,8 +46,9 @@ func Register(w http.ResponseWriter,r *http.Request,p httprouter.Params){
 	http.SetCookie(w,&cookie)
 	cookie2 := http.Cookie{Name:"username",Value:user.Username}
 	http.SetCookie(w,&cookie2)
-	http.Redirect(w,r,"/",http.StatusFound)
+
 	common.JsonSucess(w,data,200,"注册成功")
+	http.Redirect(w,r,"/",http.StatusFound)
 
 	return
 }
@@ -83,8 +84,9 @@ func Login(w http.ResponseWriter,r *http.Request,p httprouter.Params){
 	http.SetCookie(w,&cookie)
 	cookie2 := http.Cookie{Name:"username",Value:username}
 	http.SetCookie(w,&cookie2)
-	http.Redirect(w,r,"/",http.StatusFound)
+
 	common.JsonSucess(w,session_id,200,"ok")
+	http.Redirect(w,r,"/",http.StatusFound)
 
 }
 
