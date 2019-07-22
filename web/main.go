@@ -37,6 +37,6 @@ func RegisterHandler() *httprouter.Router{
 }
 func main(){
 	r := RegisterHandler()
-	http.ListenAndServe("10.13.165.25:9000",r)
+	http.ListenAndServe(":9000",r)
 }
 
