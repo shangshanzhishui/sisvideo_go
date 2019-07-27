@@ -26,7 +26,9 @@ func ClearVideoDispatcher(d DataChan)error{
 }
 
 func DelVideo(vid string) error{
+	log.Println("111111111111111111111111111111111")
 	err:= os.Remove(VIDEO_DICTORY+vid)
+
 	log.Println(err)
 	if err !=nil && !os.IsNotExist(err){
 		log.Println(err)

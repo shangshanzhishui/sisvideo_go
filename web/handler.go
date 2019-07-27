@@ -24,8 +24,13 @@ type User struct {
 	C string
 }
 
+type Sy struct {
+	Username string
+	Videos interface{}
+}
 func MyHomeHandler(w http.ResponseWriter,r *http.Request,p httprouter.Params){
 	//video.ListAllVideos(w,r,p)
+	sy := Sy{}
 	username := p.ByName("username")
 	id,err := user.GetUserId(username)
 	s,err:=video.GetUserVideos(id)
@@ -35,6 +40,8 @@ func MyHomeHandler(w http.ResponseWriter,r *http.Request,p httprouter.Params){
 		return
 	}
 	//sid ,err := r.Cookie("session")
+	sy.Username = username
+	sy.Videos = s
 	log.Println(s)
 	if err != nil{
 		log.Println(err)
@@ -45,7 +52,7 @@ func MyHomeHandler(w http.ResponseWriter,r *http.Request,p httprouter.Params){
 		common.JsonFail(w,500,"chucuo")
 		return
 	}
-	t.Execute(w,s)
+	t.Execute(w,sy)
 	return
 	//if sid.Value =="ds"{
 	//	http.Redirect(w,r,"/user",http.StatusFound)
@@ -190,20 +197,20 @@ func apiHandler(w http.ResponseWriter,r *http.Request,p httprouter.Params){
 }
 
 func proxyScheHandler(w http.ResponseWriter,r *http.Request,p httprouter.Params){
-	u,_ := url.Parse("http://127.0.0.1:9003/")
+	u,_ := url.Parse("http://0.0.0.0:9003/")
 	proxy := httputil.NewSingleHostReverseProxy(u)
 	proxy.ServeHTTP(w,r)
 }
 
 
 func proxyServeHandler(w http.ResponseWriter,r *http.Request,p httprouter.Params){
-	u,_ := url.Parse("http://127.0.0.1:9001/")
+	u,_ := url.Parse("http://0.0.0.0:9001/")
 	proxy := httputil.NewSingleHostReverseProxy(u)
 	proxy.ServeHTTP(w,r)
 }
 
 func proxyStreamHandler(w http.ResponseWriter,r *http.Request,p httprouter.Params){
-	u,err := url.Parse("http://127.0.0.1:9002/")
+	u,err := url.Parse("http://0.0.0.0:9002/")
 	log.Println(u)
 	if err !=nil{
 		log.Println(err)

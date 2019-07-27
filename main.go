@@ -44,7 +44,7 @@ func main(){
 	session.LoadAllSession()
 	r := RegisterHandle()
 	m := MiddleWareHandler(r)
-	http.ListenAndServe(":9001",m)
+	http.ListenAndServe("0.0.0.0:9001",m)
 
 
 }

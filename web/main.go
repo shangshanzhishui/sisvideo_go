@@ -24,7 +24,7 @@ func RegisterHandler() *httprouter.Router{
 	router.POST("/video/:username",proxyStreamHandler)
 	router.POST("/videos/:video_id/comment",proxyServeHandler)
 	router.DELETE("/videos/:video_id/comment",proxyServeHandler)
-	router.DELETE("/videos/:video_id/user/:athour_id",proxyScheHandler)
+	router.DELETE("/videos/:video_id/user/:username",proxyScheHandler)
 
 	//代理stream——server
 	router.POST("/videos",proxyStreamHandler)
@@ -37,6 +37,6 @@ func RegisterHandler() *httprouter.Router{
 }
 func main(){
 	r := RegisterHandler()
-	http.ListenAndServe(":9000",r)
+	http.ListenAndServe("0.0.0.0:9000",r)
 }
 

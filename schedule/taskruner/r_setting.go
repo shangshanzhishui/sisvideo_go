@@ -10,7 +10,7 @@ const (
 	READY_EXECUTE = "e"
 	CLOSE = "c"
 
-	VIDEO_DICTORY = "../../videos/" //shipinlujing
+	VIDEO_DICTORY = "../videos/" //shipinlujing
 )
 
 

@@ -7,7 +7,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title>{{.Username}}视频 | Home :: w3layouts</title>
+	<title>{{.Username}}的视频中心 | Home :: w3layouts</title>
 	<link href="/statics/css/style1.css" rel='stylesheet' type='text/css' />
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="shortcut icon" type="image/x-icon" href="/statics/images/fav-icon.png" />
@@ -51,7 +51,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 <div class="header">
 	<div class="wrap">
 		<div class="logo">
-			<a href="index.html"><img src="/statics/images/logo.png" title="pinbal" /></a>
+			<a href="/"><img src="/statics/images/logo.png" title="pinbal" /></a>
 		</div>
 		<div class="nav-icon">
 			<a href="#" class="right_bt" id="activator"><span> </span> </a>
@@ -94,16 +94,19 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 			<ul id="tiles">
 				<!-- These are our grid blocks -->
 
-				{{range .}}
-				<li onclick="location.href={{.Video_path}};">
-					<img src={{.Image_path}} width="200" height="200">
+				{{range .Videos}}
+				<li >
+					<div onclick="location.href={{.Video_path}};">
+						<img src={{.Image_path}} width="200" height="200">
+					</div>
+
 					<div class="post-info">
 						<div class="post-basic-info">
 							<h3><a href={{.Video_path}}>{{.Video_name}}</a></h3>
-							<h3><a href="/user/{{.Author_id}}">用户:{{.Username}}</a></h3>
+							<h3><a href="/user/{{.Username}}">用户:{{.Username}}</a></h3>
 
 							<p>上傳時間:{{.Display_time}}</p>
-							<button value="删除" onclick="del();" >删除</button>
+
 						</div>
 						<div class="post-info-rate-share">
 							<div class="rateit">
@@ -115,7 +118,9 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 							<div class="clear"> </div>
 						</div>
 					</div>
+					<button value="删除" onclick="del({{.Video_path}},{{.Author_id}});" >删除</button>
 				</li>
+
 				{{end}}
 				<!-- End of grid blocks -->
 			</ul>
@@ -165,12 +170,22 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 
 	})(jQuery);
 
-	function del() {
+	function del(v,a) {
+
+			var c = document.cookie;
+			if (c.length ==0){
+				alert("请登陆");
+				return;
+			}
+
+			var username = c.split(";")[1].split("=")[1];
+
+
+		var url = v+"/user/"+username
 		$.ajax({
 			cache:false,
 			type:"DELETE",
-			url:"{{.Video_path}}/{{.Author_id}}",
-			data:jsonData,
+			url:url,
 			dataType:"json",
 			async:false,
 			beforeSend:function (xhr,settings) {
@@ -179,13 +194,15 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 			success:function (data) {
 
 				if (data.status == "fail"){
-						alert(data.msg);
+					alert(data.msg);
 				}else if(data.status == "ok"){
 					alert(data.msg);
 					window.location.reload();
 				}
 			}
-	})
+		})
+	}
+
 </script>
 
 <div class="footer">

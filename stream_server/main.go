@@ -38,5 +38,5 @@ func registerHandler() *httprouter.Router{
 func main(){
 	r:= registerHandler()
 	//sm:= NewStreamMiddleWareHandle(r,2)
-	http.ListenAndServe(":9002",r)
+	http.ListenAndServe("0.0.0.0:9002",r)
 }
